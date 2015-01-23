@@ -1,0 +1,61 @@
+#!/usr/bin/python
+"""Parse BAIP type xlsx files
+
+"""
+
+import os
+import inspect
+import sys
+
+import daemoniser
+import baip_parser
+
+CONF = os.path.join(os.sep, 'etc', 'baip', 'conf', 'parser.conf')
+
+
+def main():
+    """Script entry point.
+
+    """
+    service = daemoniser.Service()
+    service.parser.add_option('-f', '--file',
+                              dest='file',
+                              help='file to process inline (start only)')
+    service.parser.add_option('-i', '--inbound_dir',
+                              dest='inbound_dir',
+                              help='source directory')
+    script_name = os.path.basename(inspect.getfile(inspect.currentframe()))
+    service.check_args(script_name)
+
+    # Check if a filename was provided on the command line.
+    command_line_file = None
+    if service.options.file:
+        command_line_file = service.options.file
+
+    inbound_dir = None
+    if service.options.inbound_dir:
+        inbound_dir = service.options.inbound_dir
+
+    config_file = service.options.config
+    if config_file is None:
+        if os.path.exists(CONF):
+            config_file = CONF
+
+    if config_file is None:
+        sys.exit('Unable to source the BAIP parser.conf')
+    else:
+        conf = baip_parser.ParserConfig(config_file)
+        conf.parse_config()
+
+    # OK, start processing.
+    parserd = baip_parser.ParserDaemon(pidfile=service.pidfile,
+                                       filename=command_line_file,
+                                       inbound_dir=inbound_dir,
+                                       dry=service.dry,
+                                       batch=service.batch,
+                                       conf=conf)
+
+    service.launch_command(parserd, script_name)
+
+if __name__ == '__main__':
+    main()
