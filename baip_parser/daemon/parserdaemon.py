@@ -84,7 +84,7 @@ class ParserDaemon(daemoniser.Daemon):
             if self.filename is not None:
                 files_to_process = [self.filename]
             else:
-                files_to_process = self.source_files()
+                files_to_process = self.source_files(file_filter='.*\.xlsx$')
 
         while not event.isSet():
             results = []

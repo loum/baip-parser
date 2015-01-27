@@ -67,7 +67,7 @@ class TestParserDaemon(unittest2.TestCase):
                                  'M02',
                                  'BA-M02-AS-001-CoverPrelims-v34.docx')]
         msg = 'Sourcing files with no filter error'
-        self.assertListEqual(received, expected, msg)
+        self.assertListEqual(sorted(received), sorted(expected), msg)
 
     def test_source_files_valid_directory_with_xlsx_filter(self):
         """Walk directory for files: with xlsx filter.
@@ -98,7 +98,7 @@ class TestParserDaemon(unittest2.TestCase):
                                  'M02',
                                  'BA-M02-AS-v07.xlsx')]
         msg = 'Sourcing files with xlsx filter error'
-        self.assertListEqual(received, expected, msg)
+        self.assertListEqual(sorted(received), sorted(expected), msg)
 
     def test_start_dry_run(self):
         """ParserDaemon dry run.
