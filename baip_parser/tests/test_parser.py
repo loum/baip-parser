@@ -111,27 +111,28 @@ class TestParser(unittest2.TestCase):
         received = parser.parse_sheets()
 
         # I should receive a populated dictionary structure.
-        expected = {'AAA-000-001': {'B1': u'AAA-000-001'},
-                    'CLM-121-001': {'B1': u'CLM-121-001'},
-                    'CLM-121-002': {'B1': u'CLM-121-002'},
-                    'CLM-121-003': {'B1': u'CLM-121-003'},
-                    'CLM-121-004': {'B1': u'CLM-121-004'},
-                    'CLM-121-013': {'B1': u'CLM-121-013'},
-                    'CLM-121-014': {'B1': u'CLM-121-014'},
-                    'CLM-121-015': {'B1': u'CLM-121-015'},
-                    'CLM-121-016': {'B1': u'CLM-121-016'},
-                    'CLM-121-017': {'B1': u'CLM-121-017'},
-                    'CLM-121-018': {'B1': u'CLM-121-018'},
-                    'CLM-121-019': {'B1': u'CLM-121-019'},
-                    'CLM-121-020': {'B1': u'CLM-121-020'},
-                    'CLM-121-021': {'B1': u'CLM-121-021'},
-                    'CLM-121-022': {'B1': u'CLM-121-022'},
-                    'CLM-121-023': {'B1': u'CLM-121-023'},
-                    'CLM-121-024': {'B1': u'CLM-121-024'},
-                    'CLM-121-025': {'B1': u'CLM-121-025'},
-                    'ControlSheet': {'B1': None},
-                    'Instructions': {'B1': None},
-                    'WorkbookLog': {'B1': u'Date'}}
+        filename = 'BA-CLM-CLM-121-CRDPathway-v04.xlsx'
+        expected = {'%s|AAA-000-001' % filename: {'B1': u'AAA-000-001'},
+                    '%s|CLM-121-001' % filename: {'B1': u'CLM-121-001'},
+                    '%s|CLM-121-002' % filename: {'B1': u'CLM-121-002'},
+                    '%s|CLM-121-003' % filename: {'B1': u'CLM-121-003'},
+                    '%s|CLM-121-004' % filename: {'B1': u'CLM-121-004'},
+                    '%s|CLM-121-013' % filename: {'B1': u'CLM-121-013'},
+                    '%s|CLM-121-014' % filename: {'B1': u'CLM-121-014'},
+                    '%s|CLM-121-015' % filename: {'B1': u'CLM-121-015'},
+                    '%s|CLM-121-016' % filename: {'B1': u'CLM-121-016'},
+                    '%s|CLM-121-017' % filename: {'B1': u'CLM-121-017'},
+                    '%s|CLM-121-018' % filename: {'B1': u'CLM-121-018'},
+                    '%s|CLM-121-019' % filename: {'B1': u'CLM-121-019'},
+                    '%s|CLM-121-020' % filename: {'B1': u'CLM-121-020'},
+                    '%s|CLM-121-021' % filename: {'B1': u'CLM-121-021'},
+                    '%s|CLM-121-022' % filename: {'B1': u'CLM-121-022'},
+                    '%s|CLM-121-023' % filename: {'B1': u'CLM-121-023'},
+                    '%s|CLM-121-024' % filename: {'B1': u'CLM-121-024'},
+                    '%s|CLM-121-025' % filename: {'B1': u'CLM-121-025'},
+                    '%s|ControlSheet' % filename: {'B1': None},
+                    '%s|Instructions' % filename: {'B1': None},
+                    '%s|WorkbookLog' % filename: {'B1': u'Date'}}
         msg = 'Expected dictionary values error: parse all worksheets'
         self.assertDictEqual(received, expected, msg)
 
@@ -158,23 +159,24 @@ class TestParser(unittest2.TestCase):
         received = parser.parse_sheets()
 
         # I should receive a populated dictionary structure.
-        expected = {'AAA-000-001': {'B1': u'AAA-000-001'},
-                    'CLM-121-001': {'B1': u'CLM-121-001'},
-                    'CLM-121-002': {'B1': u'CLM-121-002'},
-                    'CLM-121-003': {'B1': u'CLM-121-003'},
-                    'CLM-121-004': {'B1': u'CLM-121-004'},
-                    'CLM-121-013': {'B1': u'CLM-121-013'},
-                    'CLM-121-014': {'B1': u'CLM-121-014'},
-                    'CLM-121-015': {'B1': u'CLM-121-015'},
-                    'CLM-121-016': {'B1': u'CLM-121-016'},
-                    'CLM-121-017': {'B1': u'CLM-121-017'},
-                    'CLM-121-018': {'B1': u'CLM-121-018'},
-                    'CLM-121-019': {'B1': u'CLM-121-019'},
-                    'CLM-121-020': {'B1': u'CLM-121-020'},
-                    'CLM-121-021': {'B1': u'CLM-121-021'},
-                    'CLM-121-022': {'B1': u'CLM-121-022'},
-                    'CLM-121-023': {'B1': u'CLM-121-023'},
-                    'CLM-121-024': {'B1': u'CLM-121-024'},
-                    'CLM-121-025': {'B1': u'CLM-121-025'}}
+        filename = 'BA-CLM-CLM-121-CRDPathway-v04.xlsx'
+        expected = {'%s|AAA-000-001' % filename: {'B1': u'AAA-000-001'},
+                    '%s|CLM-121-001' % filename: {'B1': u'CLM-121-001'},
+                    '%s|CLM-121-002' % filename: {'B1': u'CLM-121-002'},
+                    '%s|CLM-121-003' % filename: {'B1': u'CLM-121-003'},
+                    '%s|CLM-121-004' % filename: {'B1': u'CLM-121-004'},
+                    '%s|CLM-121-013' % filename: {'B1': u'CLM-121-013'},
+                    '%s|CLM-121-014' % filename: {'B1': u'CLM-121-014'},
+                    '%s|CLM-121-015' % filename: {'B1': u'CLM-121-015'},
+                    '%s|CLM-121-016' % filename: {'B1': u'CLM-121-016'},
+                    '%s|CLM-121-017' % filename: {'B1': u'CLM-121-017'},
+                    '%s|CLM-121-018' % filename: {'B1': u'CLM-121-018'},
+                    '%s|CLM-121-019' % filename: {'B1': u'CLM-121-019'},
+                    '%s|CLM-121-020' % filename: {'B1': u'CLM-121-020'},
+                    '%s|CLM-121-021' % filename: {'B1': u'CLM-121-021'},
+                    '%s|CLM-121-022' % filename: {'B1': u'CLM-121-022'},
+                    '%s|CLM-121-023' % filename: {'B1': u'CLM-121-023'},
+                    '%s|CLM-121-024' % filename: {'B1': u'CLM-121-024'},
+                    '%s|CLM-121-025' % filename: {'B1': u'CLM-121-025'}}
         msg = 'Expected dictionary values error: skipped worksheets'
         self.assertDictEqual(received, expected, msg)

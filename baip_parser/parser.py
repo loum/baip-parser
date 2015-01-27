@@ -4,6 +4,7 @@
 """
 __all__ = ["Parser"]
 
+import os
 import openpyxl
 
 from logga.log import log
@@ -140,7 +141,10 @@ class Parser(object):
             if self.skip_sheet(sheet):
                 continue
 
-            parsed_values[sheet] = {}
+            # Need to make the key unique as the concatenation of the
+            # workbook and worksheet
+            key = '%s|%s' % (os.path.basename(self.filepath), sheet)
+            parsed_values[key] = {}
 
             # Set active sheet.
             ws = self.workbook.get_sheet_by_name(sheet)
@@ -149,6 +153,6 @@ class Parser(object):
             for cell in self.cells_to_extract:
                 value = ws[cell].value
                 log.debug('Extracted cell|value: %s|%s' % (cell, value))
-                parsed_values[sheet][cell] = value
+                parsed_values[key][cell] = value
 
         return parsed_values
