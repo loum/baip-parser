@@ -76,6 +76,11 @@ class TestParserConfig(unittest2.TestCase):
         msg = 'ParserConfig.cell_map not as expected'
         self.assertDictEqual(received, expected, msg)
 
+        received = self._conf.header_field_lengths
+        expected = {'apple': 5}
+        msg = 'ParserConfig.header_field_lengths not as expected'
+        self.assertDictEqual(received, expected, msg)
+
     def tearDown(self):
         self._conf = None
         del self._conf

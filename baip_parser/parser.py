@@ -21,7 +21,6 @@ class Parser(object):
     _workbook = None
     _skip_sheets = []
     _cells_to_extract = []
-    _parsed_values = {}
 
     @property
     def filepath(self):

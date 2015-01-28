@@ -213,8 +213,7 @@ class TestParserDaemon(unittest2.TestCase):
 
         # And I run the parser daemon in dry mode
         old_dry = self._parserd.dry
-        # self._parserd.dry = True
-        self._parserd.dry = False
+        self._parserd.dry = True
         self._parserd._start(self._parserd.exit_event)
 
         # Clean up.
@@ -225,6 +224,93 @@ class TestParserDaemon(unittest2.TestCase):
         self._parserd.conf.cell_order = old_cell_order
         self._parserd.conf.cell_map = old_cell_map
         self._parserd.conf.ignore_if_empty = old_ignore_if_empty
+        self._parserd.exit_event.clear()
+
+    def test_start_dry_run_with_inbound_directory_headers_truncated(self):
+        """ParserDaemon dry run: with inbound directory.
+        """
+        # Given an inbound directory
+        inbound_dir = os.path.join('baip_parser', 'tests', 'files')
+        old_file = self._parserd.inbound_dir
+        self._parserd.inbound_dir = inbound_dir
+
+        # and skip sheets are set
+        old_skip_sheets = self._parserd.conf.skip_sheets
+        self._parserd.conf.skip_sheets = ['ControlSheet',
+                                          'Instructions',
+                                          'WorkbookLog',
+                                          'Description',
+                                          'Water-dependent asset register',
+                                          'Asset list',
+                                          'pivot table',
+                                          'AAA-000-001']
+
+        # And cells to extract is set
+        old_cells_to_extract = self._parserd.conf.cells_to_extract
+        self._parserd.conf.cells_to_extract = ['B1',
+                                               'B2',
+                                               'B3',
+                                               'B4',
+                                               'B6',
+                                               'B8',
+                                               'B9',
+                                               'B10',
+                                               'B11']
+
+        # And cell ordering is set
+        old_cell_order = self._parserd.conf.cells_to_extract
+        self._parserd.conf.cell_order = ['B10',
+                                         'B1',
+                                         'B2',
+                                         'B3',
+                                         'B4',
+                                         'B6',
+                                         'B8',
+                                         'B9',
+                                         'B10',
+                                         'B11']
+
+        # And the header aliases have been set.
+        old_cell_map = self._parserd.conf.cell_map
+        self._parserd.conf.cell_map = {'B1': ['field_element_number'],
+                                       'B2': ['field_data_source'],
+                                       'B3': ['field_image_source'],
+                                       'B4': ['field_other_source'],
+                                       'B6': ['field_updated_by'],
+                                       'B8': ['field_element_type'],
+                                       'B9': ['field_figure_table_number'],
+                                       'B10': ['name', 'description'],
+                                       'B11': ['field_alt_text']}
+
+        # And empty fields to skip have been set
+        old_ignore_if_empty = self._parserd.conf.ignore_if_empty
+        self._parserd.conf.ignore_if_empty = ['B10',
+                                              'B2',
+                                              'B3',
+                                              'B4',
+                                              'B6',
+                                              'B8',
+                                              'B9',
+                                              'B11']
+
+        # And header field lengths have been set
+        old_header_field_lengths = self._parserd.conf.header_field_lengths
+        self._parserd.conf.header_field_lengths = {'name': 10}
+
+        # And I run the parser daemon in dry mode
+        old_dry = self._parserd.dry
+        self._parserd.dry = True
+        self._parserd._start(self._parserd.exit_event)
+
+        # Clean up.
+        self._parserd.dry = old_dry
+        self._parserd.filename = old_file
+        self._parserd.conf.skip_sheets = old_skip_sheets
+        self._parserd.conf.cells_to_extract = old_cells_to_extract
+        self._parserd.conf.cell_order = old_cell_order
+        self._parserd.conf.cell_map = old_cell_map
+        self._parserd.conf.ignore_if_empty = old_ignore_if_empty
+        self._parserd.conf.header_field_lengths = old_header_field_lengths
         self._parserd.exit_event.clear()
 
     def test_dump(self):

@@ -167,10 +167,11 @@ class ParserDaemon(daemoniser.Daemon):
         outfile = outfile_obj.name
         outfile_obj.close()
         writer.outfile = outfile
+        writer.header_field_lengths = self.conf.header_field_lengths
         writer.headers = writer.header_aliases(self.conf.cell_order,
                                                self.conf.cell_map)
         if not dry:
-            writer(data)
+            writer.write(data, word_boundary=True)
         else:
             log.info('Skipping dump in dry mode')
 

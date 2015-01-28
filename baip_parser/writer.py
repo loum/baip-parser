@@ -20,14 +20,19 @@ class Writer(object):
 
         name and order of the column headers
 
-    .. attribute:: write_headers
+    .. attribute:: write_out_headers
 
         write the column names in the first row (default ``True``)
+
+    .. attribute:: header_field_lengths
+
+        dictionary of header keys and associated field lengths
 
     """
     _outfile = None
     _headers = []
-    _write_headers = True
+    _write_out_headers = True
+    _header_field_lengths = {}
 
     def __init__(self, outfile=None):
         """Writer initialiser.
@@ -37,23 +42,7 @@ class Writer(object):
             self._outfile = outfile
 
     def __call__(self, data):
-        """Class callable that writes list of tuple values in *data*.
-
-        **Args:**
-            *data*: list of tuples to write out
-
-        """
-        log.debug('Preparing "%s" for output' % self.outfile)
-        fh = open(self.outfile, 'wb')
-
-        writer = csv.DictWriter(fh, delimiter=',', fieldnames=self.headers)
-        if self.write_headers:
-            writer.writerow(dict((fn, fn) for fn in self.headers))
-
-        for row in data:
-            writer.writerow(dict(zip(self.headers, row)))
-
-        fh.close()
+        self.write(data)
 
     @property
     def outfile(self):
@@ -73,46 +62,83 @@ class Writer(object):
         self._headers = []
 
         if values is not None and isinstance(values, list):
-            log.debug('Setting headers to "%s"' % str(values))
             self._headers.extend(values)
 
     @property
-    def write_headers(self):
-        return self._headers
+    def write_out_headers(self):
+        return self._write_out_headers
 
-    @write_headers.setter
-    def write_headers(self, value=False):
-        self._write_headers = value
+    @write_out_headers.setter
+    def write_out_headers(self, value=False):
+        self._write_out_headers = value
 
-    def filter(self, headers, headers_displayed, row):
-        """Takes a list of column *headers* and filters the *row*
-        based on the list of *headers_displayed*.
+    @property
+    def header_field_lengths(self):
+        return self._header_field_lengths
+
+    @header_field_lengths.setter
+    def header_field_lengths(self, values):
+        self._header_field_lengths.clear()
+
+        if values is not None and isinstance(values, dict):
+            self._header_field_lengths = values
+
+    def write(self, data, word_boundary=False):
+        """Class callable that writes list of tuple values in *data*.
 
         **Args:**
-            *headers*: all column headers
-
-            *headers_displayed*: headers to display
-
-            *row*: tuple-based column values
-
-        **Returns:**
-            tuple of filtered *row* values
+            *data*: list of tuples to write out
 
         """
-        log.debug('Filtering out data to display for row: "%s"' % str(row))
+        log.debug('Preparing "%s" for output' % self.outfile)
+        fh = open(self.outfile, 'wb')
 
-        new_row_list = []
-        for i in headers_displayed:
-            log.debug('Extracting header "%s" value' % i)
-            try:
-                index = headers.index(i)
-                value = row[index]
-                log.debug('Header "%s" value is "%s"' % (i, value))
-                new_row_list.append(value)
-            except ValueError:
-                log.warn('Header to display "%s" not in column list' % i)
+        writer = csv.DictWriter(fh, delimiter=',', fieldnames=self.headers)
+        if self.write_out_headers:
+            writer.writerow(dict((fn, fn) for fn in self.headers))
 
-        return tuple(new_row_list)
+        for row in data:
+            row = self.truncate_row(row, word_boundary)
+            writer.writerow(dict(zip(self.headers, row)))
+
+        fh.close()
+
+    def truncate_row(self, row, word_boundary=False):
+        """Check if the field length is flagged as having a maximum
+        value.  If so, the field will be truncated.
+
+        Obtains the field length from the :attr:`header_field_lengths`
+        attribute.
+
+        **Args:**
+            *row*: tuple structure representing the a line row to output
+
+            *word_boundary*: if ``True``, will truncate the string
+            on the last word boundary (drops off the last word)
+
+        """
+        truncated_row = []
+
+        index = 0
+        for value in row:
+            header = self.headers[index]
+            if self.header_field_lengths.get(header) is not None:
+                field_length = self.header_field_lengths.get(header)
+                log.debug('Truncate header "%s" value to length: %d' %
+                          (header, field_length))
+                value = value[:field_length]
+
+                if word_boundary:
+                    # Tidy up around word boundary - drop the last word.
+                    value = value.rsplit(' ', 1)[0]
+
+                log.debug('New header value: "%s"' % value)
+
+            truncated_row.append(value)
+
+            index += 1
+
+        return tuple(truncated_row)
 
     def header_aliases(self, headers_displayed, header_aliases):
         """Substitute the raw header_values in *headers_displayed* with
