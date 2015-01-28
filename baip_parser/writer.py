@@ -28,11 +28,17 @@ class Writer(object):
 
         dictionary of header keys and associated field lengths
 
+    .. attribute:: header_field_thresholds
+
+        dictionary of header keys and associated minimum field length
+        thresholds
+
     """
     _outfile = None
     _headers = []
     _write_out_headers = True
     _header_field_lengths = {}
+    _header_field_thresholds = {}
 
     def __init__(self, outfile=None):
         """Writer initialiser.
@@ -83,6 +89,17 @@ class Writer(object):
         if values is not None and isinstance(values, dict):
             self._header_field_lengths = values
 
+    @property
+    def header_field_thresholds(self):
+        return self._header_field_thresholds
+
+    @header_field_thresholds.setter
+    def header_field_thresholds(self, values):
+        self._header_field_thresholds.clear()
+
+        if values is not None and isinstance(values, dict):
+            self._header_field_thresholds = values
+
     def write(self, data, word_boundary=False):
         """Class callable that writes list of tuple values in *data*.
 
@@ -99,6 +116,7 @@ class Writer(object):
 
         for row in data:
             row = self.truncate_row(row, word_boundary)
+            row = self.length_check(row)
             writer.writerow(dict(zip(self.headers, row)))
 
         fh.close()
@@ -139,6 +157,40 @@ class Writer(object):
             index += 1
 
         return tuple(truncated_row)
+
+    def length_check(self, row):
+        """Determines the field value length and checks against the
+        column threshold to see whether the column value is acceptable.
+
+        Obtains the field length from the :attr:`header_field_lengths`
+        attribute.
+
+        If the column value length threshold is not met, then the value
+        will be replaced by the empty string.
+
+        **Args:**
+            *row*: tuple structure representing the a line row to output
+
+        """
+        new_row = []
+
+        index = 0
+        for value in row:
+            header = self.headers[index]
+            if self.header_field_thresholds.get(header) is not None:
+                field_threshold = self.header_field_thresholds.get(header)
+                log.debug('Header "%s" length threshold: %d' %
+                          (header, field_threshold))
+                if len(value) <= field_threshold:
+                    value = str()
+                    log.debug('New header "%s" value: "%s"' %
+                              (header, value))
+
+            new_row.append(value)
+
+            index += 1
+
+        return tuple(new_row)
 
     def header_aliases(self, headers_displayed, header_aliases):
         """Substitute the raw header_values in *headers_displayed* with

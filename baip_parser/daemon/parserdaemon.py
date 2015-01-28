@@ -168,6 +168,7 @@ class ParserDaemon(daemoniser.Daemon):
         outfile_obj.close()
         writer.outfile = outfile
         writer.header_field_lengths = self.conf.header_field_lengths
+        writer.header_field_thresholds = self.conf.header_field_thresholds
         writer.headers = writer.header_aliases(self.conf.cell_order,
                                                self.conf.cell_map)
         if not dry:

@@ -19,6 +19,7 @@ PYTHONPATH=.:../logga:../configa:../daemoniser:../filer
 # Note: for this to work you will need to import the test class into
 # the current namespace via "tests/__init__.py"
 TEST=baip_parser.tests:TestParser \
+	baip_parser.tests:TestWriter \
 	baip_parser.config.tests:TestParserConfig \
 	baip_parser.daemon.tests:TestParserDaemon
 

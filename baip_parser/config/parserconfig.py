@@ -25,6 +25,7 @@ class ParserConfig(Config):
     _ignore_if_empty = []
     _cell_map = {}
     _header_field_lengths = {}
+    _header_field_thresholds = {}
 
     def __init__(self, config_file=None):
         """:class:`baip_parser.ParserConfig` initialisation.
@@ -104,6 +105,14 @@ class ParserConfig(Config):
     def set_header_field_lengths(self, values):
         pass
 
+    @property
+    def header_field_thresholds(self):
+        return self._header_field_thresholds
+
+    @set_dict
+    def set_header_field_thresholds(self, values):
+        pass
+
     def parse_config(self):
         """Read config items from the configuration file.
 
@@ -138,6 +147,8 @@ class ParserConfig(Config):
                    'key_case': 'upper',
                    'is_list': True},
                   {'section': 'header_field_lengths',
+                   'cast_type': 'int'},
+                  {'section': 'header_field_thresholds',
                    'cast_type': 'int'}]
         for kwarg in kwargs:
             self.parse_dict_config(**kwarg)
