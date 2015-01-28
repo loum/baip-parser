@@ -142,15 +142,16 @@ class Writer(object):
             header = self.headers[index]
             if self.header_field_lengths.get(header) is not None:
                 field_length = self.header_field_lengths.get(header)
-                log.debug('Truncate header "%s" value to length: %d' %
-                          (header, field_length))
-                value = value[:field_length]
+                if len(value) > field_length:
+                    log.debug('Truncate header "%s" value to length: %d' %
+                              (header, field_length))
+                    value = value[:field_length]
 
-                if word_boundary:
-                    # Tidy up around word boundary - drop the last word.
-                    value = value.rsplit(' ', 1)[0]
+                    if word_boundary:
+                        # Tidy up around word boundary - drop the last word.
+                        value = value.rsplit(' ', 1)[0]
 
-                log.debug('New header value: "%s"' % value)
+                    log.debug('New header value: "%s"' % value)
 
             truncated_row.append(value)
 
