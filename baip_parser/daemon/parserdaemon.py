@@ -157,12 +157,12 @@ class ParserDaemon(daemoniser.Daemon):
         data = []
         for result in results:
             for key, value in result.iteritems():
-                value = self.length_check(value)
+                reduced_values = self.length_check(value)
 
-                if not self.skip_set(value):
+                if not self.skip_set(reduced_values):
                     line_item = []
                     for cell in self.conf.cell_order:
-                        tmp_value = value[cell]
+                        tmp_value = reduced_values[cell]
 
                         if isinstance(tmp_value, unicode):
                             # Remove the non-breaking hyphen.
@@ -228,7 +228,7 @@ class ParserDaemon(daemoniser.Daemon):
         configuration setting.
 
         If the column value length threshold is not met, then the value
-        will be replaced by the empty string.
+        will be replaced with ``None``.
 
         **Args:**
             *data*: dictionary structure representing the a cell value
@@ -247,6 +247,6 @@ class ParserDaemon(daemoniser.Daemon):
             if new_data.get(cell) is not None:
                 # We have a value.  Check the length.
                 if len(new_data.get(cell)) <= length:
-                    new_data[cell] = str()
+                    new_data[cell] = None
 
         return new_data

@@ -87,7 +87,7 @@ class TestParserConfig(unittest2.TestCase):
         self.assertDictEqual(received, expected, msg)
 
         received = self._conf.cell_field_thresholds
-        expected = {'banana': 10}
+        expected = {'BANANA': 10}
         msg = 'ParserConfig.cell_field_thresholds not as expected'
         self.assertDictEqual(received, expected, msg)
 
