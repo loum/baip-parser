@@ -158,6 +158,7 @@ class ParserConfig(Config):
                    'key_case': 'upper',
                    'is_list': True},
                   {'section': 'cell_field_thresholds',
+                   'key_case': 'upper',
                    'cast_type': 'int'},
                   {'section': 'header_field_lengths',
                    'cast_type': 'int'}]
