@@ -50,6 +50,9 @@ class TestParserDaemon(unittest2.TestCase):
                                  'BA-CLM-CLM-123-CRDPathway-v04.xlsx'),
                     os.path.join(source_dir,
                                  'CLM1.2',
+                                 '~$BA-CLM-CLM-123-CRDPathway-v04.xlsx'),
+                    os.path.join(source_dir,
+                                 'CLM1.2',
                                  'BA-CLM-CLM-121-CRDPathway-v04.xlsx'),
                     os.path.join(source_dir,
                                  'CLM1.2',
@@ -81,7 +84,7 @@ class TestParserDaemon(unittest2.TestCase):
 
         # When sourcing files with xlsx filtering.
         received = self._parserd.source_files(directory=source_dir,
-                                              file_filter='.*\.xlsx$')
+                                              file_filter='[^~].*\.xlsx$')
         expected = [os.path.join(source_dir,
                                  'CLM1.2',
                                  'BA-CLM-CLM-122-CRDPathway-v04.xlsx'),
