@@ -86,9 +86,9 @@ class TestParserConfig(unittest2.TestCase):
         msg = 'ParserConfig.header_field_lengths not as expected'
         self.assertDictEqual(received, expected, msg)
 
-        received = self._conf.header_field_thresholds
+        received = self._conf.cell_field_thresholds
         expected = {'banana': 10}
-        msg = 'ParserConfig.header_field_thresholds not as expected'
+        msg = 'ParserConfig.cell_field_thresholds not as expected'
         self.assertDictEqual(received, expected, msg)
 
     def tearDown(self):

@@ -122,7 +122,6 @@ class Writer(object):
         for row in data:
             counter += 1
             row = self.truncate_row(row, word_boundary)
-            row = self.length_check(row)
             log.debug('Writing out row: %s' % str(row))
             writer.writerow(dict(zip(self.headers, row)))
 
@@ -166,40 +165,6 @@ class Writer(object):
             index += 1
 
         return tuple(truncated_row)
-
-    def length_check(self, row):
-        """Determines the field value length and checks against the
-        column threshold to see whether the column value is acceptable.
-
-        Obtains the field length from the :attr:`header_field_lengths`
-        attribute.
-
-        If the column value length threshold is not met, then the value
-        will be replaced by the empty string.
-
-        **Args:**
-            *row*: tuple structure representing the a line row to output
-
-        """
-        new_row = []
-
-        index = 0
-        for value in row:
-            header = self.headers[index]
-            if self.header_field_thresholds.get(header) is not None:
-                field_threshold = self.header_field_thresholds.get(header)
-                log.debug('Header "%s" length threshold: %d' %
-                          (header, field_threshold))
-                if len(value) <= field_threshold:
-                    value = str()
-                    log.debug('New header "%s" value: "%s"' %
-                              (header, value))
-
-            new_row.append(value)
-
-            index += 1
-
-        return tuple(new_row)
 
     def header_aliases(self, headers_displayed, header_aliases):
         """Substitute the raw header_values in *headers_displayed* with

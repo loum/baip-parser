@@ -157,6 +157,8 @@ class ParserDaemon(daemoniser.Daemon):
         data = []
         for result in results:
             for key, value in result.iteritems():
+                value = self.length_check(value)
+
                 if not self.skip_set(value):
                     line_item = []
                     for cell in self.conf.cell_order:
@@ -176,7 +178,7 @@ class ParserDaemon(daemoniser.Daemon):
         outfile_obj.close()
         writer.outfile = outfile
         writer.header_field_lengths = self.conf.header_field_lengths
-        writer.header_field_thresholds = self.conf.header_field_thresholds
+        writer.cell_field_thresholds = self.conf.cell_field_thresholds
         writer.headers = writer.header_aliases(self.conf.cell_order,
                                                self.conf.cell_map)
         if not dry:
@@ -217,3 +219,34 @@ class ParserDaemon(daemoniser.Daemon):
         log.debug('Can row: %s be skipped? %s' % (data, skip))
 
         return skip
+
+    def length_check(self, data):
+        """Determines the field value length and checks against the
+        column threshold to see whether the column value is acceptable.
+
+        Obtains the field length from the :attr:`cell_field_lengths`
+        configuration setting.
+
+        If the column value length threshold is not met, then the value
+        will be replaced by the empty string.
+
+        **Args:**
+            *data*: dictionary structure representing the a cell value
+            parsed in the form::
+
+                {<cell>: <value>}
+
+        **Returns:**
+            the updated (if length threshold is breached) dictionary
+            values
+
+        """
+        new_data = dict(data)
+
+        for cell, length in self.conf.cell_field_thresholds.iteritems():
+            if new_data.get(cell) is not None:
+                # We have a value.  Check the length.
+                if len(new_data.get(cell)) <= length:
+                    new_data[cell] = str()
+
+        return new_data

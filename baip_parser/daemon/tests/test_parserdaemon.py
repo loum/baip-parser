@@ -388,9 +388,9 @@ class TestParserDaemon(unittest2.TestCase):
                                               'B9',
                                               'B11']
 
-        # And header field thresholds have been set
-        old_header_field_thresholds = self._parserd.conf.header_field_thresholds
-        self._parserd.conf.header_field_thresholds = {'name': 200}
+        # And cell field thresholds have been set
+        old_cell_field_thresholds = self._parserd.conf.cell_field_thresholds
+        self._parserd.conf.cell_field_thresholds = {'B10': 200}
 
         # And I run the parser daemon in dry mode
         old_dry = self._parserd.dry
@@ -405,7 +405,7 @@ class TestParserDaemon(unittest2.TestCase):
         self._parserd.conf.cell_order = old_cell_order
         self._parserd.conf.cell_map = old_cell_map
         self._parserd.conf.ignore_if_empty = old_ignore_if_empty
-        self._parserd.conf.header_field_lengths = old_header_field_thresholds
+        self._parserd.conf.cell_field_thresholds = old_cell_field_thresholds
         self._parserd.exit_event.clear()
 
     def test_dump(self):
@@ -461,6 +461,69 @@ class TestParserDaemon(unittest2.TestCase):
         self._parserd.conf.cells_to_extract = old_cells_to_extract
         self._parserd.conf.cell_order = old_cell_order
         self._parserd.conf.cell_map = old_cell_map
+        remove_files(outfile)
+
+    def test_dump_length_check(self):
+        """Write out the results to file: length_check.
+        """
+        # Given I want to write out my parsed data into CSV format
+        results = [{
+            'CLM-121-003': {
+                'B1': 'CLM-121-003',
+                'B2': 'string of 23 characters',
+                'B10': u'Isopach (thickness) map of Walloon Coal Measures (Ingram and Robinson, 1996) and comparison with thickness of Walloon Coal Measures recorded at coal seam gas, coal exploration, petroleum exploration and stratigraphic wells in the Clarence-Moreton bioregion'},
+            'CLM-121-002': {
+                'B1': 'CLM-121-002',
+                'B2': 'another string of 31 characters',
+                'B10': u'Identified coal resources and operating and historical coal mines in the Clarence-Moreton bioregion (additional historical coal mines in Queensland that are not included in the OZMIN database are described in Cameron, 1970)'
+            }
+        }]
+
+        # and cells to extract is set
+        old_cells_to_extract = self._parserd.conf.cells_to_extract
+        self._parserd.conf.cells_to_extract = ['B1', 'B2', 'B10']
+
+        # and cell ordering is set
+        old_cell_order = self._parserd.conf.cells_to_extract
+        self._parserd.conf.cell_order = ['B10', 'B1', 'B2']
+
+        # and the header aliases have been set.
+        old_cell_map = self._parserd.conf.cell_map
+        self._parserd.conf.cell_map = {'B10': ['name'],
+                                       'B1': ['sheet_name'],
+                                       'B2': ['length_check']}
+
+        # and the cell thresholds have been set
+        old_cell_field_thresholds = self._parserd.conf.cell_field_thresholds
+        self._parserd.conf.cell_field_thresholds = {'B2': 23}
+
+        # When I dump results to file
+        outfile = self._parserd.dump(results)
+
+        # Then a CSV file should be produced
+        msg = 'Dump CSV file was not produced'
+        self.assertTrue(os.path.exists(outfile), msg)
+
+        # And the content should match
+        outfile_fh = open(outfile)
+        received = outfile_fh.read().rstrip()
+
+        results_file = os.path.join('baip_parser',
+                                    'daemon',
+                                    'tests',
+                                    'results',
+                                    'dump_results_02.csv')
+        results_fh = open(results_file)
+        expected = results_fh.read().rstrip()
+        msg = 'Dump CSV content mis-match'
+        self.assertEqual(received, expected, msg)
+
+        # Clean up.
+        self._parserd.conf.cell_order = old_cell_order
+        self._parserd.conf.cells_to_extract = old_cells_to_extract
+        self._parserd.conf.cell_order = old_cell_order
+        self._parserd.conf.cell_map = old_cell_map
+        self._parserd.conf.cell_field_thresholds = old_cell_field_thresholds
         remove_files(outfile)
 
     def test_skip_set_single_value(self):
@@ -554,6 +617,48 @@ class TestParserDaemon(unittest2.TestCase):
 
         # Clean up.
         self._parserd.conf.ignore_if_empty = old_ignore_if_empty
+
+    def test_length_check_empty_thresholds(self):
+        """Column length threshold check: empty thresholds.
+        """
+        # Given the header field thresholds are not set
+        old_cell_field_thresholds = self._parserd.conf.cell_field_thresholds
+        self._parserd.cell_field_thresholds = {}
+
+        # And a data structure to output
+        row = {'B1': 20, 'B2': 'VIC Test Newsagent 999'}
+
+        # When I check the row value lengths against the threshold
+        received = self._parserd.length_check(row)
+
+        # Then the original row should be changed.
+        expected = row
+        msg = 'Row values have been altered (no thresholds set)'
+        self.assertDictEqual(received, expected, msg)
+
+        # Clean up.
+        self._parserd.conf.cell_field_thresholds = old_cell_field_thresholds
+
+    def test_length_check(self):
+        """Column length threshold check.
+        """
+        # Given the header field thresholds are set
+        old_cell_field_thresholds = self._parserd.conf.cell_field_thresholds
+        self._parserd.conf.cell_field_thresholds = {'AGENT_NAME': 22}
+
+        # and a data structure to check
+        data = {'JOB_ITEM_ID': 20, 'AGENT_NAME': 'VIC Test Newsagent 999'}
+
+        # When I check the row value lengths against the threshold
+        received = self._parserd.length_check(data)
+
+        # Then the original row should be changed.
+        expected = {'JOB_ITEM_ID': 20, 'AGENT_NAME': ''}
+        msg = 'Data values have NOT been altered (thresholds set)'
+        self.assertDictEqual(received, expected, msg)
+
+        # Clean up.
+        self._parserd.conf.cell_field_thresholds = old_cell_field_thresholds
 
     def tearDown(self):
         del self._parserd
