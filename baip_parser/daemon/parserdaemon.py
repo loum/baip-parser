@@ -158,12 +158,13 @@ class ParserDaemon(daemoniser.Daemon):
                 if not self.skip_set(value):
                     line_item = []
                     for cell in self.conf.cell_order:
-                        if value[cell] is None:
-                            line_item.append(None)
-                        elif isinstance(value[cell], str):
-                            line_item.append(value[cell].encode('utf-8'))
-                        else:
-                            line_item.append(value[cell])
+                        tmp_value = value[cell]
+
+                        if isinstance(tmp_value, unicode):
+                            # Remove the non-breaking hyphen.
+                            tmp_value = tmp_value.replace(u'\u2011', '-')
+
+                        line_item.append(tmp_value)
 
                     data.append(tuple(line_item))
 
