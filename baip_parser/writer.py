@@ -106,6 +106,9 @@ class Writer(object):
         **Args:**
             *data*: list of tuples to write out
 
+            *word_boundary*: if ``True``, attempts to tidy-up a truncated
+            string by removing the last word in the sentence
+
         """
         log.debug('Preparing "%s" for output' % self.outfile)
         fh = open(self.outfile, 'wb')
@@ -114,12 +117,17 @@ class Writer(object):
         if self.write_out_headers:
             writer.writerow(dict((fn, fn) for fn in self.headers))
 
+        log.debug('Received %d records to write' % len(data))
+        counter = 0
         for row in data:
+            counter += 1
             row = self.truncate_row(row, word_boundary)
             row = self.length_check(row)
+            log.debug('Writing out row: %s' % str(row))
             writer.writerow(dict(zip(self.headers, row)))
 
         fh.close()
+        log.debug('%d records written to "%s"' % (counter, self.outfile))
 
     def truncate_row(self, row, word_boundary=False):
         """Check if the field length is flagged as having a maximum

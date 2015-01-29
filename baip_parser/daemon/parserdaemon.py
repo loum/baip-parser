@@ -158,7 +158,12 @@ class ParserDaemon(daemoniser.Daemon):
                 if not self.skip_set(value):
                     line_item = []
                     for cell in self.conf.cell_order:
-                        line_item.append(value[cell])
+                        if value[cell] is None:
+                            line_item.append(None)
+                        elif isinstance(value[cell], str):
+                            line_item.append(value[cell].encode('utf-8'))
+                        else:
+                            line_item.append(value[cell])
 
                     data.append(tuple(line_item))
 
