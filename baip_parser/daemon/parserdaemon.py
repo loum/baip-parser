@@ -84,7 +84,8 @@ class ParserDaemon(daemoniser.Daemon):
             if self.filename is not None:
                 files_to_process = [self.filename]
             else:
-                files_to_process = self.source_files('[^~].*\.xlsx$')
+                filter = self.conf.file_filter
+                files_to_process = self.source_files(file_filter=filter)
 
         while not event.isSet():
             results = []
@@ -130,7 +131,8 @@ class ParserDaemon(daemoniser.Daemon):
         if file_filter is not None:
             reg_c = re.compile(file_filter)
 
-        log.debug('Sourcing files at: %s' % directory_to_check)
+        log.debug('Sourcing files at "%s" with filter "%s"' %
+                  (directory_to_check, file_filter))
         for dirpath, dirnames, filenames in os.walk(directory_to_check):
             for filename in filenames:
                 if reg_c is not None:

@@ -18,6 +18,7 @@ class ParserConfig(Config):
     """
     _thread_sleep = 2.0
     _inbound_dir = None
+    _file_filter = None
     _archive_dir = None
     _skip_sheets = []
     _cells_to_extract = []
@@ -47,6 +48,14 @@ class ParserConfig(Config):
 
     @set_scalar
     def set_inbound_dir(self, value):
+        pass
+
+    @property
+    def file_filter(self):
+        return self._file_filter
+
+    @set_scalar
+    def set_file_filter(self, value):
         pass
 
     @property
@@ -124,6 +133,8 @@ class ParserConfig(Config):
                    'cast_type': 'float'},
                   {'section': 'parse',
                    'option': 'inbound_dir'},
+                  {'section': 'parse',
+                   'option': 'file_filter'},
                   {'section': 'parse',
                    'option': 'archive_dir'},
                   {'section': 'parse',

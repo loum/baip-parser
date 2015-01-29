@@ -152,8 +152,12 @@ class TestParserDaemon(unittest2.TestCase):
         """
         # Given an inbound directory
         inbound_dir = os.path.join('baip_parser', 'tests', 'files')
-        old_file = self._parserd.inbound_dir
+        old_inbound_dir = self._parserd.inbound_dir
         self._parserd.inbound_dir = inbound_dir
+
+        # and a non-opened excel file filter
+        old_file_filter = self._parserd.conf.file_filter
+        self._parserd.conf.file_filter = '[^~].*\.xlsx'
 
         # and skip sheets are set
         old_skip_sheets = self._parserd.conf.skip_sheets
@@ -221,7 +225,8 @@ class TestParserDaemon(unittest2.TestCase):
 
         # Clean up.
         self._parserd.dry = old_dry
-        self._parserd.filename = old_file
+        self._parserd.inbound_dir = old_inbound_dir
+        self._parserd.conf.file_filter = old_file_filter
         self._parserd.conf.skip_sheets = old_skip_sheets
         self._parserd.conf.cells_to_extract = old_cells_to_extract
         self._parserd.conf.cell_order = old_cell_order

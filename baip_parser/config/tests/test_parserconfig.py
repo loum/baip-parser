@@ -44,6 +44,11 @@ class TestParserConfig(unittest2.TestCase):
         msg = 'ParserConfig.inbound_dir not as expected'
         self.assertEqual(received, expected, msg)
 
+        received = self._conf.file_filter
+        expected = '[^~].*\.xlsx$'
+        msg = 'ParserConfig.file_filter not as expected'
+        self.assertEqual(received, expected, msg)
+
         received = self._conf.archive_dir
         expected = '/var/tmp/baip-parser/archive'
         msg = 'ParserConfig.archive_dir not as expected'
