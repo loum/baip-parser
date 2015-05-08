@@ -166,7 +166,11 @@ class ParserDaemon(daemoniser.Daemon):
 
                         if isinstance(tmp_value, unicode):
                             # Remove the non-breaking hyphen.
+                            # These really should be put in as a
+                            # configuration item.  Fugly ...
                             tmp_value = tmp_value.replace(u'\u2011', '-')
+                            tmp_value = tmp_value.replace(u'\u00B1', '-')
+                            tmp_value = tmp_value.replace(u'\u2019', '-')
 
                         line_item.append(tmp_value)
 
